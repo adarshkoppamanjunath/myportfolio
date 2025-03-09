@@ -6,7 +6,7 @@ st.set_page_config(page_title="Adarsh Koppa Manjunath - Python Developer | SDET"
 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Skill Summary", "Work Experience", "Projects", "Education"])
+page = st.sidebar.radio("Go to", ["Home", "Skill Summary", "Work Experience", "Projects", "Education", "Contact"])
 
 # Home Page
 if page == "Home":
@@ -27,16 +27,11 @@ if page == "Home":
     """)
 
     # GitHub URL to the raw resume file
-    resume_url = "https://raw.githubusercontent.com/adarshkoppamanjunath/your-repository/branch/resume.pdf"  # Replace with actual URL
+    resume_url = "https://raw.githubusercontent.com/adarshkoppamanjunath/myportfolio/main/AdarshResume.pdf"  # Replace with actual URL
 
     # Add a download button for the resume
-    with open(resume_url, "rb") as file:
-        st.download_button(
-            label="Download Resume", 
-            data=file, 
-            file_name="Adarsh_Koppa_Resume.pdf", 
-            mime="application/pdf"
-        )
+    st.markdown(f"[Download Resume]({resume_url})")
+    
 if page == "Skill Summary":
     st.title("🛠️ Skill Summary")
     st.markdown("### **Python Developer | SDET | QA Automation**")
@@ -137,7 +132,7 @@ if page == "Projects":
     repos = requests.get(repo_url).json()
 
     # List all projects (excluding data compression)
-    exclude_repos = ['data_compression']  # List repos to exclude
+    exclude_repos = ['data_compression','myportfolio']  # List repos to exclude
     for repo in repos:
         if repo['name'].lower() not in exclude_repos:
             with st.expander(f"#### [{repo['name']}]({repo['html_url']})"):
@@ -200,6 +195,47 @@ if page == "Education":
         UVCE | **72.65%**  
         Courses: Programming Languages (C, C++, Java, PHP, C#), Data Structures, Algorithms, OOPs, Database Systems, and Web Development.
         """)
+
+if page == "Contact":
+    st.title("📬 Contact Me")
+
+    st.markdown("""
+    If you would like to get in touch, feel free to use the form below to send me a message!
+    """)
+
+    # Create a form
+    with st.form(key='contact_form'):
+        name = st.text_input("Your Name")
+        email = st.text_input("Your Email")
+        message = st.text_area("Your Message")
+
+        # Submit button
+        submit_button = st.form_submit_button("Send Message")
+
+        if submit_button:
+            if name and email and message:
+                # Set up the EmailJS API
+                emailjs_url = "https://api.emailjs.com/api/v1.0/email/send"
+                payload = {
+                    "service_id": "SERVICE_ID",   # Replace with your EmailJS Service ID
+                    "template_id": "TEMPLATE_ID",  # Replace with your EmailJS Template ID
+                    "user_id": "USER_ID",          # Replace with your EmailJS User ID
+                    "template_params": {
+                        "user_name": name,
+                        "user_email": email,
+                        "message": message
+                    }
+                }
+
+                # Send the email
+                response = requests.post(emailjs_url, json=payload)
+
+                if response.status_code == 200:
+                    st.success("Your message has been sent successfully!")
+                else:
+                    st.error("Oops! Something went wrong. Please try again later.")
+            else:
+                st.error("Please fill in all fields.")
 
 # Footer Section (for all pages)
 st.markdown("""
