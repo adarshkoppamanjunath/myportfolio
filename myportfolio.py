@@ -217,9 +217,9 @@ if page == "Contact":
                 # Set up the EmailJS API
                 emailjs_url = "https://api.emailjs.com/api/v1.0/email/send"
                 payload = {
-                    "service_id": "SERVICE_ID",   # Replace with your EmailJS Service ID
-                    "template_id": "TEMPLATE_ID",  # Replace with your EmailJS Template ID
-                    "user_id": "USER_ID",          # Replace with your EmailJS User ID
+                    "service_id": st.secrets["service_id"],   # Replace with your EmailJS Service ID
+                    "template_id":  st.secrets["template_id"],  # Replace with your EmailJS Template ID
+                    "user_id":st.secrets["user_id"] ,          # Replace with your EmailJS User ID
                     "template_params": {
                         "user_name": name,
                         "user_email": email,
