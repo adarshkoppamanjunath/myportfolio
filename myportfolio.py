@@ -1,4 +1,5 @@
 import streamlit as st
+import httpx
 import requests
 
 # Set the title and page configuration
@@ -135,8 +136,8 @@ if page == "Projects":
     exclude_repos = ['data_compression','myportfolio']  # List repos to exclude
     for repo in repos:
         if repo['name'].lower() not in exclude_repos:
-            with st.expander(f"#### [{repo['name']}]({repo['html_url']})"):
-                # Summarize the description based on the repo name keywords
+            st.markdown(f"#### <a href='{repo['html_url']}' target='_blank'>{repo['name']}</a>", unsafe_allow_html=True)
+            with st.expander("View Details"):
                 repo_name = repo['name'].lower()
                 if 'k8-ms' in repo_name:
                     st.markdown("🚀 **Kubernetes Microservices**<br>"
@@ -150,7 +151,7 @@ if page == "Projects":
                     st.markdown("⚡ **FastAPI with SQLite Deployment on Render**<br>"
                                 "🔐 Includes **JWT authentication** and **authorization**<br>"
                                 "📊 Provides **CRUD endpoints** with **rate limiting**<br>"
-                                "🔗 [Access FastAPI Docs](https://python-flask-apis.onrender.com/docs)",
+                                "🔗 <a href='https://python-flask-apis.onrender.com/docs' target='_blank'>Access FastAPI Docs</a>",
                                 unsafe_allow_html=True)
 
                 elif 'postman-rest-api-tests' in repo_name:
@@ -174,9 +175,8 @@ if page == "Projects":
                     st.markdown("📊 **Streamlit Web App Example**<br>"
                                 "🔐 Includes **JWT-based authentication** and **CRUD operations**<br>"
                                 "⚡ Backend powered by **FastAPI**<br>"
-                                "🔗 [FastAPI Repo](https://github.com/adarshkoppamanjunath/Python-Fast-APIs)",
+                                "🔗 <a href='https://github.com/adarshkoppamanjunath/Python-Fast-APIs' target='_blank'>FastAPI Repo</a>",
                                 unsafe_allow_html=True)
-
 
 # Education Page
 if page == "Education":
@@ -185,16 +185,18 @@ if page == "Education":
     # Master's Degree
     with st.expander("🎓 **Master’s Degree in Computer Science**"):
         st.markdown("""
-        University of Regina | **83.3%**  
+        University of Regina  
         Courses: Software Development, Data Science, Image Processing, and Computer Networking related fields.
         """)
 
     # Bachelor's Degree
     with st.expander("🎓 **Bachelor’s Degree in Information Technology**"):
         st.markdown("""
-        UVCE | **72.65%**  
+        UVCE
         Courses: Programming Languages (C, C++, Java, PHP, C#), Data Structures, Algorithms, OOPs, Database Systems, and Web Development.
         """)
+
+
 
 if page == "Contact":
     st.title("📬 Contact Me")
@@ -217,9 +219,9 @@ if page == "Contact":
                 # Set up the EmailJS API
                 emailjs_url = "https://api.emailjs.com/api/v1.0/email/send"
                 payload = {
-                    "service_id": st.secrets["service_id"],   # Replace with your EmailJS Service ID
-                    "template_id":  st.secrets["template_id"],  # Replace with your EmailJS Template ID
-                    "user_id":st.secrets["user_id"] ,          # Replace with your EmailJS User ID
+                    "service_id": st.secrets["service_id"],
+                    "template_id": st.secrets["template_id"],
+                    "user_id": st.secrets["user_id"],
                     "template_params": {
                         "user_name": name,
                         "user_email": email,
@@ -227,15 +229,19 @@ if page == "Contact":
                     }
                 }
 
-                # Send the email
-                response = requests.post(emailjs_url, json=payload)
+                headers = {"Content-Type": "application/json", "Origin": "http://localhost:8501"}
 
-                if response.status_code == 200:
-                    st.success("Your message has been sent successfully!")
-                else:
-                    st.error("Oops! Something went wrong. Please try again later.")
+                try:
+                    response = httpx.post(emailjs_url, json=payload, headers=headers)
+                    if response.status_code == 200:
+                        st.success("Your message has been sent successfully!")
+                    else:
+                        st.error(f"Oops! Something went wrong. Error {response.status_code}: {response.text}")
+                except Exception as e:
+                    st.error(f"Error: {str(e)}")
             else:
                 st.error("Please fill in all fields.")
+
 
 # Footer Section (for all pages)
 st.markdown("""
